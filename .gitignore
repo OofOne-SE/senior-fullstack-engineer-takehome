@@ -37,3 +37,4 @@ fabric.properties
 *.out
 go.work
 /.idea/git_toolbox_prj.xml
+*.env

@@ -5,7 +5,8 @@ const logger = console
 const config = {
     lineDelimiter: "\n",
     columnDelimiter: "\t",
-    weatherDataFilePath: "../weather.dat",
+    weatherDataFilePath: "./resources/weather.dat",
+    endpoint: "http://localhost:8080/weather",
 }
 
 
@@ -44,11 +45,21 @@ const isWeatherDataValid = (weatherData) => {
 const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weatherDataFilePath }) => {
     const weatherData = loadWeatherData(lineDelimiter, columnDelimiter, weatherDataFilePath)
     if (!isWeatherDataValid(weatherData)) {
-        logger.warn('Weather data is invalid.')
+        logger.error('Weather data is invalid, aborting...')
         return
     }
-    // todo: send weather data to API
-    console.log("done");
+    weatherData.forEach(item => {
+        logger.debug(`Sending data to API: ${JSON.stringify(item.date)}`)
+        fetch(config.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
+        })
+            .then(response => response.json())
+            .catch(error => logger.error(`Error sending data to API: ${error}`))
+    })
 }
 
 getWeatherDataAndSendToApi(config);
