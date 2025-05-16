@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
-	"server/internal/controllers"
-	"server/internal/db"
+	"server/internal/database"
+	"server/internal/weather"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db.InitDB()
+	database.Init()
 
 	engine := gin.Default()
 	engine.SetTrustedProxies(nil)

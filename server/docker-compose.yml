@@ -4,7 +4,7 @@ services:
     container_name: weatherdb
     restart: always
     ports:
-      - "5432:5432"
+      - 5432:${DB_PORT}
     env_file:
       - ".env"
     environment:
