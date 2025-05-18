@@ -1,8 +1,9 @@
-package weather
+package repository
 
 import (
 	"context"
-	"server/internal/database"
+	"server/pkg/database"
+	"server/pkg/model"
 	"time"
 )
 
@@ -14,7 +15,7 @@ func InsertWeather(ts time.Time, temp, hum float64) error {
 	return err
 }
 
-func GetWeatherByDate(ts time.Time) (*WeatherRecord, error) {
+func GetWeatherByDate(ts time.Time) (*model.WeatherRecord, error) {
 	row := database.DB.QueryRow(context.Background(), `
         SELECT temperature, humidity FROM weather WHERE timestamp = $1
     `, ts)
@@ -24,10 +25,10 @@ func GetWeatherByDate(ts time.Time) (*WeatherRecord, error) {
 		return nil, err
 	}
 
-	return &WeatherRecord{Timestamp: ts, Temperature: temp, Humidity: hum}, nil
+	return &model.WeatherRecord{Timestamp: ts, Temperature: temp, Humidity: hum}, nil
 }
 
-func GetWeatherInRange(start, end time.Time) ([]WeatherRecord, error) {
+func GetWeatherInRange(start, end time.Time) ([]model.WeatherRecord, error) {
 	rows, err := database.DB.Query(context.Background(), `
         SELECT timestamp, temperature, humidity
         FROM weather
@@ -39,9 +40,9 @@ func GetWeatherInRange(start, end time.Time) ([]WeatherRecord, error) {
 	}
 	defer rows.Close()
 
-	var results []WeatherRecord
+	var results []model.WeatherRecord
 	for rows.Next() {
-		var r WeatherRecord
+		var r model.WeatherRecord
 		if err := rows.Scan(&r.Timestamp, &r.Temperature, &r.Humidity); err != nil {
 			return nil, err
 		}

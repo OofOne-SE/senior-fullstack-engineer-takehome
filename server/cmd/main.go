@@ -4,10 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
-	"server/internal/database"
-	"server/internal/weather"
+	"server/pkg/controller"
+	"server/pkg/database"
 )
 
+// @title           Swagger Example API
 func main() {
 	dbErr := godotenv.Load(".env")
 	if dbErr != nil {
@@ -16,11 +17,18 @@ func main() {
 
 	database.Init()
 
-	engine := gin.Default()
-	engine.SetTrustedProxies(nil)
+	r := gin.Default()
+	r.SetTrustedProxies(nil)
 
-	// Set up routes from the weather controller
-	weather.Routes(engine)
+	v1 := r.Group("/api/v1")
+	{
+		weather := v1.Group("/weather")
+		{
+			weather.POST("/", controller.PostWeather)
+			weather.GET("/range", controller.GetWeatherByRange)
+			weather.GET("/day", controller.GetWeatherByDate)
+		}
+	}
 
-	engine.Run(":8080")
+	r.Run(":8080")
 }

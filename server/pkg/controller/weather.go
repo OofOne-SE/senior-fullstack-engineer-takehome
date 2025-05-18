@@ -1,21 +1,17 @@
-package weather
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"server/pkg/model"
+	"server/pkg/repository"
 	"time"
 )
 
 const dateFormat = "2006-01-02"
 
-func Routes(router *gin.Engine) {
-	router.POST("/weather", handlePostWeather)
-	router.GET("/weather/day", handleGetWeatherByDate)
-	router.GET("/weather/range", handleGetWeatherRange)
-}
-
-func handlePostWeather(c *gin.Context) {
-	var req WeatherRequest
+func PostWeather(c *gin.Context) {
+	var req model.WeatherRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
@@ -27,7 +23,7 @@ func handlePostWeather(c *gin.Context) {
 		return
 	}
 
-	if err := InsertWeather(ts, req.Temperature, req.Humidity); err != nil {
+	if err := repository.InsertWeather(ts, req.Temperature, req.Humidity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert data"})
 		return
 	}
@@ -35,7 +31,7 @@ func handlePostWeather(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{"message": "Data inserted"})
 }
 
-func handleGetWeatherByDate(c *gin.Context) {
+func GetWeatherByDate(c *gin.Context) {
 	date := c.Query("date")
 	if date == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Date is required"})
@@ -48,7 +44,7 @@ func handleGetWeatherByDate(c *gin.Context) {
 		return
 	}
 
-	record, err := GetWeatherByDate(ts)
+	record, err := repository.GetWeatherByDate(ts)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No data found for the given date"})
 		return
@@ -57,7 +53,7 @@ func handleGetWeatherByDate(c *gin.Context) {
 	c.JSON(http.StatusOK, record)
 }
 
-func handleGetWeatherRange(c *gin.Context) {
+func GetWeatherByRange(c *gin.Context) {
 	startStr := c.Query("start")
 	endStr := c.Query("end")
 
@@ -80,7 +76,7 @@ func handleGetWeatherRange(c *gin.Context) {
 
 	end = end.Add(24 * time.Hour) // make inclusive
 
-	results, err := GetWeatherInRange(start, end)
+	results, err := repository.GetWeatherInRange(start, end)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch data"})
 		return
