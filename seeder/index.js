@@ -15,7 +15,7 @@ const loadWeatherData = (lineDelimiter, columnDelimiter, filePath) => {
     console.log(filePath);
     const weatherDataFile = fs.readFileSync(filePath, 'utf8')
     return weatherDataFile.split(lineDelimiter).filter(line => !!line).map(line => {
-        const [date, humidity, temperature] = line.split(columnDelimiter)
+        const [date, temperature, humidity] = line.split(columnDelimiter)
         return {
             date: date, humidity: parseFloat(humidity), temperature: parseFloat(temperature)
         }

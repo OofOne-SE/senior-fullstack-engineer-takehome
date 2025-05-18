@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Wetterdaten</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .label {
+                @apply font-bold text-gray-700;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen">
+<main class="bg-white rounded shadow p-6 max-w-md mx-auto w-full" id="weatherDisplay">
+    <h1 class="font-bold text-2xl mb-4">Wetterdaten</h1>
+    <p><span class="label">Datum:</span> <span id="date">-</span></p>
+    <p><span class="label">Temperatur:</span> <span id="temp">-</span> °C</p>
+    <p><span class="label">Luftfeuchtigkeit:</span> <span id="humidity">-</span> %</p>
+</main>
+<script>
+    const ws = new WebSocket("ws://localhost:8080/ws");
+
+    ws.onopen = () => {
+        console.log("WebSocket connected.");
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        document.getElementById("date").textContent = new Date(data.timestamp).toLocaleDateString();
+        document.getElementById("temp").textContent = data.temperature.toFixed(0);
+        document.getElementById("humidity").textContent = data.humidity.toFixed(0);
+    };
+
+    ws.onerror = (error) => {
+        console.error("WebSocket-Fehler:", error);
+        //alert("Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konsole.");
+    };
+
+    ws.onclose = () => {
+        console.warn("WebSocket-Verbindung geschlossen.");
+    };
+</script>
+</body>
+</html>
