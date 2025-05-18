@@ -7,7 +7,7 @@ const config = {
     columnDelimiter: "\t",
     weatherDataFilePath: "./resources/weather.dat",
     endpoint: "http://localhost:8080/api/v1/weather",
-    debounceTimeInMilliseconds: 500
+    debounceTimeInMilliseconds: 2000
 }
 
 

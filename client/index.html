@@ -9,16 +9,40 @@
             .label {
                 @apply font-bold text-gray-700;
             }
+
+            .bar-container {
+                @apply bg-gray-200 h-4 rounded;
+            }
+
+            .bar {
+                 @apply h-4 rounded transition-[width] duration-500 ease-in-out;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-200 flex items-center justify-center min-h-screen">
 <main class="bg-white rounded shadow p-6 max-w-md mx-auto w-full" id="weatherDisplay">
-    <h1 class="font-bold text-2xl mb-4">Wetterdaten</h1>
-    <p><span class="label">Datum:</span> <span id="date">-</span></p>
-    <p><span class="label">Temperatur:</span> <span id="temp">-</span> °C</p>
-    <p><span class="label">Luftfeuchtigkeit:</span> <span id="humidity">-</span> %</p>
+    <h1 class="font-bold text-2xl mb-4">Wetterdaten vom <span id="date">-</span></h1>
+    <div class="grid gap-x-4 grid-cols-2 items-center">
+        <span class="label">
+            Temperatur: <span id="temp">-</span> °C
+        </span>
+        <div class="bar-container">
+            <div id="tempBar" class="bar bg-red-400" style="width: 0"></div>
+        </div>
+    </div>
+
+    <div class="grid gap-x-4 grid-cols-2 items-center">
+        <span class="label">
+            Luftfeuchtigkeit: <span id="humidity">-</span> %
+            </span>
+        <div class="bar-container">
+            <div id="humidityBar" class="bar bg-blue-400" style="width: 0"></div>
+        </div>
+    </div>
 </main>
+
 <script>
     const ws = new WebSocket("ws://localhost:8080/ws");
 
@@ -28,18 +52,25 @@
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+
         document.getElementById("date").textContent = new Date(data.timestamp).toLocaleDateString();
         document.getElementById("temp").textContent = data.temperature.toFixed(0);
         document.getElementById("humidity").textContent = data.humidity.toFixed(0);
-    };
+
+        const tempPercent = Math.min((data.temperature / 50) * 100, 100);
+        const humidityPercent = Math.min(data.humidity, 100);
+
+        document.getElementById("tempBar").style.width = `${tempPercent}%`;
+        document.getElementById("humidityBar").style.width = `${humidityPercent}%`;
+    }
 
     ws.onerror = (error) => {
-        console.error("WebSocket-Fehler:", error);
-        //alert("Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konsole.");
+        console.error("WebSocket error:", error);
+        alert("WebSocket error");
     };
 
     ws.onclose = () => {
-        console.warn("WebSocket-Verbindung geschlossen.");
+        console.warn("WebSocket connection closed.");
     };
 </script>
 </body>
