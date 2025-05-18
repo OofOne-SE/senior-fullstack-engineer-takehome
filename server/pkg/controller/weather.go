@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"server/pkg/model"
 	"server/pkg/repository"
+	"server/pkg/websocket"
 	"time"
 )
 
@@ -23,12 +25,20 @@ func PostWeather(c *gin.Context) {
 		return
 	}
 
-	if err := repository.InsertWeather(ts, req.Temperature, req.Humidity); err != nil {
+	data, err := repository.InsertWeather(ts, req.Temperature, req.Humidity)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert data"})
 		return
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{"message": "Data inserted"})
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal data"})
+		return
+	}
+
+	websocket.HubInstance().SendUpdate(string(jsonBytes))
+	c.JSON(http.StatusCreated, gin.H{"message": "Data inserted"})
 }
 
 func GetWeatherByDate(c *gin.Context) {

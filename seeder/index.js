@@ -6,7 +6,7 @@ const config = {
     lineDelimiter: "\n",
     columnDelimiter: "\t",
     weatherDataFilePath: "./resources/weather.dat",
-    endpoint: "http://localhost:8080/weather",
+    endpoint: "http://localhost:8080/api/v1/weather",
 }
 
 
@@ -48,7 +48,8 @@ const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weat
         logger.error('Weather data is invalid, aborting...')
         return
     }
-    weatherData.forEach(item => {
+    for (const item of weatherData) {
+        await new Promise(resolve => setTimeout(resolve, 500))
         logger.debug(`Sending data to API: ${JSON.stringify(item.date)}`)
         fetch(config.endpoint, {
             method: 'POST',
@@ -59,7 +60,7 @@ const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weat
         })
             .then(response => response.json())
             .catch(error => logger.error(`Error sending data to API: ${error}`))
-    })
+    }
 }
 
 getWeatherDataAndSendToApi(config);

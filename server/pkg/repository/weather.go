@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func InsertWeather(ts time.Time, temp, hum float64) error {
+func InsertWeather(ts time.Time, temp, hum float64) (model.WeatherRecord, error) {
 	_, err := database.DB.Exec(context.Background(), `
         INSERT INTO weather (timestamp, temperature, humidity)
         VALUES ($1, $2, $3)
     `, ts, temp, hum)
-	return err
+	return model.WeatherRecord{Timestamp: ts, Temperature: temp, Humidity: hum}, err
 }
 
 func GetWeatherByDate(ts time.Time) (*model.WeatherRecord, error) {

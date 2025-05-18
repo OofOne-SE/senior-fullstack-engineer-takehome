@@ -6,6 +6,7 @@ import (
 	"log"
 	"server/pkg/controller"
 	"server/pkg/database"
+	"server/pkg/websocket"
 )
 
 // @title           Swagger Example API
@@ -20,11 +21,20 @@ func main() {
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 
-	v1 := r.Group("/api/v1")
+	r.GET("/ws", func(c *gin.Context) {
+		websocket.HubInstance().HandleConnections(c.Writer, c.Request)
+	})
+
+	go websocket.HubInstance().Run()
+
+	api := r.Group("/api")
+
 	{
-		weather := v1.Group("/weather")
+		v1 := api.Group("/v1")
 		{
-			weather.POST("/", controller.PostWeather)
+			weather := v1.Group("/weather")
+
+			weather.POST("", controller.PostWeather)
 			weather.GET("/range", controller.GetWeatherByRange)
 			weather.GET("/day", controller.GetWeatherByDate)
 		}
