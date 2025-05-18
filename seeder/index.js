@@ -7,6 +7,7 @@ const config = {
     columnDelimiter: "\t",
     weatherDataFilePath: "./resources/weather.dat",
     endpoint: "http://localhost:8080/api/v1/weather",
+    debounceTimeInMilliseconds: 500
 }
 
 
@@ -49,7 +50,7 @@ const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weat
         return
     }
     for (const item of weatherData) {
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, config.debounceTimeInMilliseconds))
         logger.debug(`Sending data to API: ${JSON.stringify(item.date)}`)
         fetch(config.endpoint, {
             method: 'POST',
