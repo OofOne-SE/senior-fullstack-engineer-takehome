@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Wetterdaten</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f3f3;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .weather {
+            margin-top: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .label {
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<h1>Live Wetterdaten</h1>
+<div class="weather" id="weatherDisplay">
+    <p><span class="label">Datum:</span> <span id="date">-</span></p>
+    <p><span class="label">Temperatur:</span> <span id="temp">-</span> °C</p>
+    <p><span class="label">Luftfeuchtigkeit:</span> <span id="humidity">-</span> %</p>
+</div>
+
+<script>
+    const ws = new WebSocket("ws://localhost:8080/ws");
+
+    ws.onopen = () => {
+        console.log("WebSocket verbunden.");
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        document.getElementById("date").textContent = data.timestamp;
+        document.getElementById("temp").textContent = data.temperature;
+        document.getElementById("humidity").textContent = data.humidity;
+    };
+
+    ws.onerror = (error) => {
+        console.error("WebSocket-Fehler:", error);
+    };
+
+    ws.onclose = () => {
+        console.warn("WebSocket-Verbindung geschlossen.");
+    };
+</script>
+</body>
+</html>
