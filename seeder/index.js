@@ -51,7 +51,7 @@ const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weat
     }
     for (const item of weatherData) {
         await new Promise(resolve => setTimeout(resolve, config.debounceTimeInMilliseconds))
-        logger.debug(`Sending data to API: ${JSON.stringify(item.date)}`)
+        logger.debug(`Sending data: ${item.date}`)
         fetch(config.endpoint, {
             method: 'POST',
             headers: {
@@ -60,7 +60,7 @@ const getWeatherDataAndSendToApi = async ({ lineDelimiter, columnDelimiter, weat
             body: JSON.stringify(item)
         })
             .then(response => response.json())
-            .catch(error => logger.error(`Error sending data to API: ${error}`))
+            .catch(error => logger.error(error))
     }
 }
 

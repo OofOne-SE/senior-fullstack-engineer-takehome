@@ -4,12 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"server/pkg/controller"
 	"server/pkg/database"
 	"server/pkg/websocket"
 )
 
-// @title           Swagger Example API
 func main() {
 	dbErr := godotenv.Load(".env")
 	if dbErr != nil {
@@ -20,6 +20,11 @@ func main() {
 
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
+	r.LoadHTMLGlob("resources/*.html")
+
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 
 	r.GET("/ws", func(c *gin.Context) {
 		websocket.HubInstance().HandleConnections(c.Writer, c.Request)
