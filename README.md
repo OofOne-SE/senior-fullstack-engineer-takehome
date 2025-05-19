@@ -40,13 +40,15 @@ it, give us access to your fork so we can review and run it.
 
 # Documentation
 
+## Architecture 
+
 The application consists of three main components:
 
 1. [API](#api)
 2. [Frontend](#frontend)
 3. [Seeder](#seeder)
 
-## API
+### API
 
 The API is built using Go and exposes the following endpoints:
 
@@ -65,7 +67,7 @@ The API is built using Go and exposes the following endpoints:
   (especially when there is not only weather information sent) and the data.
 - The API is not secured. It could be secured using e.g. an API key to restrict the access.
 
-## Frontend
+### Frontend
 
 The frontend is served by the same go server as the API. It is built on HTML, CSS (TailwindCSS), and JavaScript.
 It listens to the WebSocket connection and updates the UI with the latest weather data.
@@ -78,7 +80,7 @@ It listens to the WebSocket connection and updates the UI with the latest weathe
   application more independent and scalable. The frontend could be even served by a CDN.
 - The frontend could also serve as a client for the whole api and not only the websocket connection.
 
-## Seeder
+### Seeder
 
 The seeder is a small application that reads the `weather.dat` file and sends the data to the API endpoint.
 One can configure the seeder to send the data with a specific delay between each request. The default delay is 2 second.
@@ -91,3 +93,30 @@ One can configure the seeder to send the data with a specific delay between each
 - To make the seeder more robust, one could add a retry mechanism in case the API is not reachable.
 - The seeder is built using JavaScript, it could be built in TypeScript (or even Go) to make it more robust.
 
+General thoughts:
+- One might add unit / integration tests to the API and the seeder, but there is nearly no business logic in the
+  application, so it is not really necessary.
+- One could add a linter to the API and the seeder to make the code more readable and consistent.
+
+## Running the application
+
+To run the application, follow these steps:
+
+1. Start up the database container:
+   ```bash
+   cd server
+   docker-compose up -d
+   ```
+   
+2. Run the API:
+   ```bash
+    cd server
+    go run main.go
+    ```
+   
+3. Run the seeder:
+    ```bash
+    cd seeder
+    npm install
+    npm run start
+    ```
