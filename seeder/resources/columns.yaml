@@ -2,9 +2,9 @@ columns:
   Date:
     description: The date the data was recorded
     unit: YYYY-MM-DD
-  Humidity:
-    description: Relative air humidity
-    unit: '%'
   Temperature:
     description: Ambient temperature
     unit: "\xB0C"
+  Humidity:
+    description: Relative air humidity
+    unit: '%'
